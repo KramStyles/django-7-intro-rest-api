@@ -6,4 +6,4 @@ from . import serializers
 
 class LanguageView(viewsets.ModelViewSet):
     queryset = models.Languages.objects.all()
-    serializers_class = serializers.LanguageSerializer
+    serializer_class = serializers.LanguageSerializer
