@@ -1,6 +1,11 @@
+from functools import partial
 from django.shortcuts import render
+from django.urls import reverse
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet
+
+from languages import serializers
 
 from .models import Tasks
 from .serializers import TodoSerializer
@@ -16,6 +21,7 @@ class TodoList(APIView):
         if todo.is_valid(): 
             item = todo.save()
             item.finished = False
+            item.url = reverse('todo-single', args=[item.id])
             item.save()
         return Response(todo.data)
 
@@ -23,5 +29,26 @@ class TodoList(APIView):
         Tasks.objects.all().delete()
         return Response(None)
 
+class TodoView(ModelViewSet):
+    queryset = Tasks.objects.all()
+    serializer_class = TodoSerializer
+
+
 class TodoSingle(APIView):
-    pass
+    def get(self, request, pk):
+        todo = Tasks.objects.get(pk=pk)
+
+        serializer = TodoSerializer(todo)
+        return Response(serializer.data)
+
+    # To edit a todo list
+    def patch(self, request, pk):
+        todo = Tasks.objects.get(pk=pk)
+        serializer = TodoSerializer(data=request.data, instance=todo, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+        return Response(serializer.data)
+
+    def delete(self, request, pk):
+        pass
+
