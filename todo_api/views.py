@@ -1,9 +1,9 @@
 from functools import partial
 from django.shortcuts import render
-from django.urls import reverse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.reverse import reverse
 
 from languages import serializers
 
@@ -21,7 +21,7 @@ class TodoList(APIView):
         if todo.is_valid(): 
             item = todo.save()
             item.finished = False
-            item.url = reverse('todo-single', args=[item.id])
+            item.url = reverse('todo-single', args=[item.id], request=request)
             item.save()
         return Response(todo.data)
 
@@ -50,5 +50,7 @@ class TodoSingle(APIView):
         return Response(serializer.data)
 
     def delete(self, request, pk):
-        pass
+        todo = Tasks.objects.get(pk=pk)
+        todo.delete()
+        return Response(None)
 

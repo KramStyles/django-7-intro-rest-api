@@ -9,5 +9,5 @@ route.register('v', views.TodoView)
 urlpatterns = [
     path('', views.TodoList.as_view()),
     path('<int:pk>', views.TodoSingle.as_view(), name='todo-single'),
-    # path('', include(route.urls))
+    path('', include(route.urls))
 ]
